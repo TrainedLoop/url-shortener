@@ -9,6 +9,8 @@ using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using UrlShortener.Repository.Contract;
+using UrlShortener.Repository.Mongo;
 
 namespace UrlShortener
 {
@@ -30,6 +32,13 @@ namespace UrlShortener
                 options.CheckConsentNeeded = context => true;
                 options.MinimumSameSitePolicy = SameSiteMode.None;
             });
+
+            services.AddSingleton<IUrlShortedRepository>(i =>
+                new UrlShortedRepository(
+                    Configuration.GetSection("Mongo:ConnectionsString").Value,
+                    Configuration.GetSection("Mongo:Database").Value));
+
+            services.AddSingleton(this.Configuration);
 
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
